@@ -24,7 +24,7 @@ export default {
   },
   data () {
     return {
-      fromC: 2,  // 来自哪个父组件的引用 1.dataModel 2.dataReport
+      fromC: 2,  // 来自哪个父组件的引用 1.dataModel 2.dataReport 3.screenView
       showAddReport: false,
     }
   },

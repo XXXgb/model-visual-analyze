@@ -13,7 +13,7 @@
               <Icon type="ios-keypad"></Icon>
               报告
             </MenuItem>
-            <MenuItem name="3">
+            <MenuItem name="dataScreen">
               <Icon type="ios-analytics"></Icon>
               数据大屏
             </MenuItem>
@@ -60,6 +60,10 @@ export default {
         case 'editorReport':
           this.activeName = 'dataReport';
           this.$router.push({path: '/editorReport'});
+          break;
+        case 'dataScreen':
+          this.activeName = 'dataScreen';
+          this.$router.push({path: '/screenView'});
           break;
       }
       this.initMenu();

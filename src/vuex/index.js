@@ -29,16 +29,76 @@ const store = new Vuex.Store({
         chartId: 127937921321,
         type: 'table',
         icon: 'barchart',
-        width: 200,
-        height: 200,
-        zIndex: '1',
-        top: 20,
-        left: 20,
-        backgroundColor: '#fff',
         dimensionality: [],
         measurement: [],
         chartConfig: {
           type: ''
+        },
+        chartStyle: {
+          nodeStyleForm: {
+            width: 200,
+            height: 200,
+            zIndex: '1',
+            top: 200,
+            left: 200,
+            backgroundColor: '#000',
+            borderRadius: 0,
+            boxShadow: false,
+            borderColor: 'rgba(255, 255, 255, 0)',
+            borderWidth: '1',
+            borderType: 'solid'
+          },
+          xForm: {
+            showXAxis: true,
+            xAxisTurn: false,
+            xAxisBorderType: 'solid',
+            xAxisBorderWidth: '1',
+            xAxisBorderColor: '#d9d9d9',
+            showLabelFont: true,
+            labelFontTypt: 'sans-serif',
+            labelFontSize: '12',
+            labelFontColor: '#d9d9d9',
+            textDirection: '0',
+          },
+          yForm: {
+            showYAxis: true,
+            yAxisTurn: false,
+            yAxisBorderType: 'solid',
+            yAxisBorderWidth: '1',
+            yAxisBorderColor: '#d9d9d9',
+            showLabelFont: true,
+            labelFontTypt: 'sans-serif',
+            labelFontSize: '12',
+            labelFontColor: '#d9d9d9',
+            textDirection: '0',
+          },
+          titleForm: {
+            show: true,
+            title: '未命名',
+            color: '#fff',
+            fontSize: 20,
+            fontType: 'sans-serif',
+            align: 'center'
+          },
+          plottingForm: {
+            levelSplitLine: false,
+            verticalSplitLine: false,
+            lineColor: '#d9d9d9',
+            lineType: 'solid',
+            backgroundColor: '',
+            borderColor: ''
+          },
+          legendForm: {
+            show: true,
+            fontColor: '#d9d9d9',
+            fontSize: 12,
+            fontType: 'sans-serif',
+            direction: 'top'
+          },
+          chartStyleForm: {
+            shape: 'more',
+            direction: 'level'
+          }
         }
       },
       123651221:{
@@ -46,38 +106,81 @@ const store = new Vuex.Store({
         chartId: 12365122121,
         type: 'table',
         icon: 'barchart',
-        width: 200,
-        height: 200,
-        zIndex: '1',
-        top: 100,
-        left: 100,
-        backgroundColor: '#fff',
         dimensionality: [],
         measurement: [],
         chartConfig: {
           type: ''
+        },
+        chartStyle: {
+          nodeStyleForm: {
+            width: 200,
+            height: 200,
+            zIndex: '1',
+            top: 20,
+            left: 20,
+            backgroundColor: '#000',
+            borderRadius: 0,
+            boxShadow: false,
+            borderColor: 'rgba(255, 255, 255, 0)',
+            borderWidth: '1',
+            borderType: 'solid'
+          },
+          xForm: {
+            showXAxis: true,
+            xAxisTurn: false,
+            xAxisBorderType: 'solid',
+            xAxisBorderWidth: '1',
+            xAxisBorderColor: '#d9d9d9',
+            showLabelFont: true,
+            labelFontTypt: 'sans-serif',
+            labelFontSize: '12',
+            labelFontColor: '#d9d9d9',
+            textDirection: '0',
+          },
+          yForm: {
+            showYAxis: true,
+            yAxisTurn: false,
+            yAxisBorderType: 'solid',
+            yAxisBorderWidth: '1',
+            yAxisBorderColor: '#d9d9d9',
+            showLabelFont: true,
+            labelFontTypt: 'sans-serif',
+            labelFontSize: '12',
+            labelFontColor: '#d9d9d9',
+            textDirection: '0',
+          },
+          titleForm: {
+            show: true,
+            title: '未命名',
+            color: '#fff',
+            fontSize: 20,
+            fontType: 'sans-serif',
+            align: 'center'
+          },
+          plottingForm: {
+            levelSplitLine: false,
+            verticalSplitLine: false,
+            lineColor: '#d9d9d9',
+            lineType: 'solid',
+            backgroundColor: '',
+            borderColor: ''
+          },
+          legendForm: {
+            show: true,
+            fontColor: '#d9d9d9',
+            fontSize: 12,
+            fontType: 'sans-serif',
+            direction: 'top'
+          },
+          chartStyleForm: {
+            shape: 'more',
+            direction: 'level'
+          }
         }
       },
     },
 
-    currentNode: {
-      id: 1279379213,
-      chartId: 127937921321,
-      type: 'table',
-      icon: 'barchart',
-      style: {
-        width: 200,
-        height: 200,
-        zIndex: '1',
-        top: 20,
-        left: 20,
-      },
-      dimensionality: [],
-      measurement: [],
-      chartConfig: {
-        type: ''
-      }
-    },   // 当前点击的元素
+    currentNode: null,   // 当前点击的元素
 
     hoverCurrentNode: null   // 当前鼠标滑过的元素
 
@@ -99,15 +202,17 @@ const store = new Vuex.Store({
     },
 
     updateNode(state,value){
+      console.log(value);
       state.nodeData = {
         ...state.nodeData,
         ...value
       }
       // 每次更新节点时，都更新当前选择的节点
-      state.currentNode = {
-        ...state.currentNode,
-        ...value
-      };
+      for(let key in value){
+        state.currentNode = {
+          ...value[key]
+        };
+      }
     },
 
     addNode(state,value){

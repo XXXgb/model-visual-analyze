@@ -6,11 +6,11 @@
     <Col span="1" class="wrapper-height">
       <editor-report-tool></editor-report-tool>
     </Col>
-    <Col span="16" class="wrapper-height">
+    <Col span="14" class="wrapper-height">
       <detail-body :fakeTableData="fakeTableData"></detail-body>
       <detail-footer></detail-footer>
     </Col>
-    <Col span="6" class="wrapper-height">
+    <Col span="8" class="wrapper-height">
       <report-side></report-side>
     </Col>
   </Row>
@@ -35,47 +35,47 @@ export default {
       fromC: 2,  // 来自哪个父组件的引用 1.dataModel 2.dataReport
       fakeTableData:[
         {
-          "订单号": "wedljfljwefoiwejf",
+          "订单号": 531,
           "年份": "2019",
           "省": "广东",
           "收货人手机": "13112133902",
-          "订单总金额": "1350",
+          "订单总金额": 1350,
           "支付时间": "2019-01-03 ：16:42:04",
           "收货人": "许贵斌",
         },
         {
-          "订单号": "ooweognewojnjowe",
+          "订单号": 361,
           "年份": "2019",
           "省": "江西",
           "收货人手机": "1324346456",
-          "订单总金额": "551",
+          "订单总金额": 1551,
           "支付时间": "2019-02-03 ：16:42:04",
           "收货人": "小红",
         },
         {
-          "订单号": "oweifiweng",
+          "订单号": 391,
           "年份": "2018",
           "省": "海南",
           "收货人手机": "13544545511",
-          "订单总金额": "954",
+          "订单总金额": 954,
           "支付时间": "2018-02-03 ：16:42:04",
           "收货人": "小明",
         },
         {
-          "订单号": "ofjewiofiwenfwewe",
+          "订单号": 750,
           "年份": "2019",
           "省": "江苏",
           "收货人手机": "13954984115",
-          "订单总金额": "15987",
+          "订单总金额": 1587,
           "支付时间": "2019-08-15 ：16:42:04",
           "收货人": "小刚",
         },
         {
-          "订单号": "ovwevowevwe",
+          "订单号": 519,
           "年份": "2019",
           "省": "海南",
           "收货人手机": "1347894515",
-          "订单总金额": "1478",
+          "订单总金额": 1478,
           "支付时间": "2019-09-15 ：16:42:04",
           "收货人": "小阿",
         },

@@ -4,7 +4,13 @@
       <Panel name="1">
         X轴
         <div slot="content" class="collapse-content-box">
-          <draggable v-model="xValue" :disbaled="xDisabled" @add="addDimensionality" group="dimensionality" class="draggable-box" :style="showInsertSite.type == 'dimensionality' && showInsertSite.status == true ? {background:'#e9ebee',borderRadius: '10px'} : ''">
+          <draggable
+            v-model="xValue"
+            @add="addDimensionality"
+            group="dimensionality"
+            @end="xDragEnd"
+            class="draggable-box"
+            :style="showInsertSite.type == 'dimensionality' && showInsertSite.status == true ? {background:'#e9ebee',borderRadius: '10px'} : ''">
             <transition-group>
               <!--<Tree :data="data1" expand-node></Tree>-->
               <div v-for="(item,index) in xValue" :key="index" class="side-right-draggable">
@@ -21,7 +27,13 @@
       <Panel name="2">
         Y轴
         <div slot="content" class="collapse-content-box">
-          <draggable v-model="yValue" @add="addMeasurement" group="measurement" class="draggable-box":style="showInsertSite.type == 'measurement' && showInsertSite.status == true ? {background:'#e9ebee',borderRadius: '10px'} : ''">
+          <draggable
+            v-model="yValue"
+            @add="addMeasurement"
+            group="measurement"
+            @end="yDragEnd"
+            class="draggable-box"
+            :style="showInsertSite.type == 'measurement' && showInsertSite.status == true ? {background:'#e9ebee',borderRadius: '10px'} : ''">
             <transition-group>
               <!--<Tree :data="data1" expand-node></Tree>-->
               <div v-for="(item,index) in yValue" :key="index" class="side-right-draggable">
@@ -84,7 +96,7 @@ export default {
   },
   data () {
     return {
-      chartType: 'table',
+      chartType: "",
       chartIcon: 'icon-shujuxiangqing',
       chartList: [
         /*{
@@ -142,7 +154,6 @@ export default {
       ],
       yValue: this.$store.state.currentNode ? this.$store.state.nodeData[this.$store.state.currentNode.id].measurement : [],
       filterValue: [],
-      xDisabled: false
     }
   },
   computed: {
@@ -153,25 +164,29 @@ export default {
       set(){
 
       }
-    }
+    },
+
   },
   watch:{
     '$store.state.currentNode':function (val) {
       // console.log(this.$store.state.nodeData[this.$store.state.currentNode.id]);
-      if (JSON.stringify(val) != "{}") {
-        this.noDrag(val);
+      if (val) {
         // console.log(this.$store.state.nodeData[val.id].dimensionality)
+        this.chartType = this.$store.state.nodeData[val.id].chartConfig.type;
         this.xValue = this.$store.state.nodeData[val.id].dimensionality;
         this.yValue = this.$store.state.nodeData[val.id].measurement;
       } else {
-        this.xDisabled = true;
         this.xValue = [];
         this.yValue = [];
+        this.chartType = "";
       }
-    }
+    },
   },
   methods: {
     selectChart(data){
+      if(!data){
+        return
+      }
       switch (data) {
         case 'table':
           this.chartIcon = 'icon-shujuxiangqing';
@@ -237,29 +252,26 @@ export default {
         }
       })
       // this.$store.state.nodeData[this.$store.state.currentNode.id].dimensionality = this.xValue;
-
     },
 
-    noDrag(data){
-      switch (data.chartConfig.type) {
-        // 柱状图
-        case 'bar':
-          if(data.dimensionality.length == 0){
-            this.xDisabled = false;
-          }else{
-            this.xDisabled = true;
-          }
-          break;
-        // 折线图
-        case 'line':
-          if(data.dimensionality.length == 0){
-            this.xDisabled = false;
-          }else{
-            this.xDisabled = true;
-          }
-          break;
-      }
+    xDragEnd(e){
+      this.$store.commit('updateNode',{
+        [this.$store.state.currentNode.id]: {
+          ...this.$store.state.nodeData[this.$store.state.currentNode.id],
+          dimensionality: this.xValue
+        }
+      })
+    },
+
+    yDragEnd(e){
+      this.$store.commit('updateNode',{
+        [this.$store.state.currentNode.id]: {
+          ...this.$store.state.nodeData[this.$store.state.currentNode.id],
+          measurement: this.yValue
+        }
+      })
     }
+
   }
 }
 </script>

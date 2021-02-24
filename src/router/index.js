@@ -27,6 +27,10 @@ const EditorReport = (resolve) => {
   import ('@/pages/dataReport/editorReport').then((module)=>{resolve(module)})
 };
 
+const ScreenView = (resolve) => {
+  import ('@/pages/dataScreen/screenView').then((module)=>{resolve(module)})
+};
+
 
 
 Vue.use(Router)
@@ -58,6 +62,12 @@ export default new Router({
           path: 'editorReport',
           component: EditorReport,
           name: 'editorReport',  // 编辑报告
+          redirect: '',
+        },
+        {
+          path: 'screenView',
+          component: ScreenView,
+          name: 'screenView',  // 数据大屏
           redirect: '',
         }
       ]

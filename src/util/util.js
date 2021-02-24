@@ -11,5 +11,21 @@ export default {
 
     var uuid = s.join("");
     return uuid;
+  },
+
+  getColor(count){
+    let result = [];
+    for(let j=0;j<count;j++){
+      let color="#";
+      console.log(j)
+      for(let i=0;i<6;i++){
+        console.log(i)
+        color += (Math.random()*16 | 0).toString(16);
+      }
+      console.log(color);
+      result.push(color);
+    }
+
+    return result;
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="dr-detail-body">
-    <div class="huaban" id="huaban" :style="{transform: 'scale(' + zoomValue/100 + ')'}" @click="clickHuaban">
-      <div class="huaban-node" @dblclick="dbClickNode(item)" @click.ctrl.exact="deleteNode(item)" @mouseenter="mouseEnter(item)" @mouseleave="mouseLeave(item)" :id="item.id" :ref="item.id" @click.stop="clickNode(item)" v-for="(item,index) in nodeData" :key="index" :style="{width: item.width+'px',height: item.height+'px',zIndex: item.zIndex,top: item.top+'px',left: item.left+'px',backgroundColor: item.backgroundColor}">
+    <div class="huaban" id="huaban" :style="{transform: 'scale(' + zoomValue/100 + ')',width: width + 'px', height: height + 'px'}" @click="clickHuaban">
+      <div class="huaban-node" @dblclick="dbClickNode(item)" @click.ctrl.exact="deleteNode(item)" @mouseenter="mouseEnter(item)" @mouseleave="mouseLeave(item)" :id="item.id" :ref="item.id" @click.stop="clickNode(item)" v-for="(item,index) in nodeData" :key="index" :style="{width: item.chartStyle.nodeStyleForm.width+'px',height: item.chartStyle.nodeStyleForm.height+'px',zIndex: item.chartStyle.nodeStyleForm.zIndex,top: item.chartStyle.nodeStyleForm.top+'px',left: item.chartStyle.nodeStyleForm.left+'px', backgroundColor: item.chartStyle.nodeStyleForm.backgroundColor, borderStyle: item.chartStyle.nodeStyleForm.borderType, borderColor: item.chartStyle.nodeStyleForm.borderColor, borderWidth: item.chartStyle.nodeStyleForm.borderWidth + 'px', borderRadius: item.chartStyle.nodeStyleForm.borderRadius + 'px', boxShadow: item.chartStyle.nodeStyleForm.boxShadow ? ' 0px 0px 10px' + item.chartStyle.nodeStyleForm.borderColor : '0px 0px 0px' + item.chartStyle.nodeStyleForm.borderColor}">
         <div class="node-resize" :style="item.id == selectNode.id ? {display: 'block'} : {display: 'none'}">
           <div class="resize-border resize-top-left" @mousedown.stop="resizeMouseDown($event,item,'topLeft')"></div>
           <div class="resize-border resize-top" @mousedown.stop="resizeMouseDown($event,item,'top')"></div>
@@ -12,12 +12,15 @@
           <div class="resize-border resize-bottom-left" @mousedown.stop="resizeMouseDown($event,item,'bottomLeft')"></div>
           <div class="resize-border resize-left" @mousedown.stop="resizeMouseDown($event,item,'left')"></div>
         </div>
-        <div class="node-graphic" :id="item.chartId" :style="dbClickNodeValue.id == item.id ? {zIndex: 999} : {}">
+        <div style="position: absolute;top: 0;left: 0;width: 100%;height: 30px;" v-if="item.chartConfig.type != ''" :style="item.chartStyle.titleForm.show ? { color: item.chartStyle.titleForm.color, fontSize: item.chartStyle.titleForm.fontSize + 'px', textAlign: item.chartStyle.titleForm.align, fontFamily: item.chartStyle.titleForm.fontType } : {}">
+          {{item.chartStyle.titleForm.title}}
+        </div>
+        <div class="node-graphic" :id="item.chartId" :style="dbClickNodeValue.id == item.id ? {zIndex: 999} : item.chartConfig.type == '' ? {height: '100%',top: '0'} : {height: 'calc(100% - 30px)',top: '30px'}">
           <div class="node-title">
-            <h2>表格</h2>
+            <h2 v-html="item.type == 'table' ? '表格' : '图表'"></h2>
           </div>
           <div class="node-no-data-img">
-            <img style="width: 80%;height: 80%;" :src="item.type == 'table' ? '../../../../static/images/' + item.type + 'Node.png' : ''">
+            <img style="width: 80%;height: 80%;" :src="item.type ? '../../../../static/images/' + item.type + 'Node.png' : ''">
           </div>
         </div>
         <div class="node-move" :class="$store.state.hoverCurrentNode && $store.state.hoverCurrentNode.id == item.id ? 'node-move-hover' : ''" @mousedown.stop="moveMouseDown($event,item)" @mouseup.stop="moveMouseUp($event)">
@@ -35,19 +38,27 @@ export default {
   props: ['fakeTableData'],
   data () {
     return {
-      width: '1000',
-      height: '760',
+      width: window.screen.width,
+      height: window.screen.height,
       moveX: '',
       moveY: '',
       chartObj: {},
       lastZIndex: '',
-      dbClickNodeValue: {}
+      dbClickNodeValue: {},
+      resizeParams: {
+        resizeNode: '',
+        moveX: '',
+        moveY: '',
+        fWidth: '',
+        fHeight: '',
+        moveLeft: '',
+        moveTop: ''
+      }
     }
   },
   watch:{
     '$store.state.zoomValue': function (val) {
-      this.width = 960 * (val / 100) + 40;
-      this.height = 720 * (val / 100) + 40;
+
     },
     '$store.state.nodeData': function (val) {
       this.updateOneChart();
@@ -67,7 +78,12 @@ export default {
     },
     selectNode: {
       get(){
-        return this.$store.state.currentNode
+        if(this.$store.state.currentNode){
+          return this.$store.state.currentNode
+        }else{
+          return {}
+        }
+
       },
       set(){
 
@@ -78,8 +94,33 @@ export default {
     this.nodeData = this.$store.state.nodeData;
     this.bindKeyboard();
     this.initChart();
+    console.log(this.detectZoom());
   },
   methods: {
+    detectZoom (){
+      var ratio = 0,
+        screen = window.screen,
+        ua = navigator.userAgent.toLowerCase();
+
+      if (window.devicePixelRatio !== undefined) {
+        ratio = window.devicePixelRatio;
+      }
+      else if (~ua.indexOf('msie')) {
+        if (screen.deviceXDPI && screen.logicalXDPI) {
+          ratio = screen.deviceXDPI / screen.logicalXDPI;
+        }
+      }
+      else if (window.outerWidth !== undefined && window.innerWidth !== undefined) {
+        ratio = window.outerWidth / window.innerWidth;
+      }
+
+      if (ratio){
+        ratio = Math.round(ratio * 100);
+      }
+
+      return ratio;
+    },
+
     bindKeyboard(){
       let that = this;
       document.onkeyup = function(e) {
@@ -95,12 +136,14 @@ export default {
     },
 
     clickHuaban(){
-      this.$store.commit('updateCurrentNode',{});
+      console.log('点击了画板');
+      this.$store.commit('updateCurrentNode',null);
       this.dbClickNodeValue = {};
     },
 
     // 调整容器大小
     resizeMouseDown(event,node,type){
+      console.log('改变大小')
       this.$store.commit('updateCurrentNode',node);
       let resizeNode = document.getElementById(this.selectNode.id);
       let moveX,moveY,fWidth,fHeight,moveLeft,moveTop;
@@ -154,9 +197,10 @@ export default {
       }
 
       window.onmousemove = (event)=>{
+        console.log('改变大小22222')
         switch (type) {
           case 'right':
-            resizeNode.style.width = fWidth+(event.clientX - moveX)+'px';
+            resizeNode.style.width = fWidth+(event.clientX - this.resizeParams.moveX)+'px';
             break;
           case 'left':
             moveLeft = event.pageX - this.moveX + 'px';
@@ -207,15 +251,23 @@ export default {
 
 
       }
-      window.onmouseup = ()=>{
+      window.onmouseup = (event)=>{
+        window.onmousemove = null;
+        console.log('删除鼠标释放事件')
         // 更新位置
         this.$store.commit('updateNode',{
           [this.selectNode.id]: {
             ...this.$store.state.nodeData[this.selectNode.id],
-            top: this.$refs[this.selectNode.id][0].style.top.slice(0,this.$refs[this.selectNode.id][0].style.top.length-2),
-            left: this.$refs[this.selectNode.id][0].style.left.slice(0,this.$refs[this.selectNode.id][0].style.left.length-2),
-            width: resizeNode.style.width.slice(0,resizeNode.style.width.length-2),
-            height: resizeNode.style.height.slice(0,resizeNode.style.height.length-2),
+            chartStyle: {
+              ...this.$store.state.nodeData[this.selectNode.id].chartStyle,
+              nodeStyleForm: {
+                ...this.$store.state.nodeData[this.selectNode.id].chartStyle.nodeStyleForm,
+                top: this.$refs[this.selectNode.id][0].style.top.slice(0,this.$refs[this.selectNode.id][0].style.top.length-2),
+                left: this.$refs[this.selectNode.id][0].style.left.slice(0,this.$refs[this.selectNode.id][0].style.left.length-2),
+                width: resizeNode.style.width.slice(0,resizeNode.style.width.length-2),
+                height: resizeNode.style.height.slice(0,resizeNode.style.height.length-2),
+              },
+            }
           }
         });
         try {
@@ -226,8 +278,7 @@ export default {
 
         }
 
-        window.onmousemove = null;
-        console.log(this.nodeData)
+
       }
     },
 
@@ -255,10 +306,16 @@ export default {
       this.$store.commit('updateNode',{
         [this.selectNode.id]: {
           ...this.$store.state.nodeData[this.selectNode.id],
-          top: this.$refs[this.selectNode.id][0].style.top.slice(0,this.$refs[this.selectNode.id][0].style.top.length-2),
-          left: this.$refs[this.selectNode.id][0].style.left.slice(0,this.$refs[this.selectNode.id][0].style.left.length-2),
-          width: resizeNode.style.width.slice(0,resizeNode.style.width.length-2),
-          height: resizeNode.style.height.slice(0,resizeNode.style.height.length-2),
+          chartStyle: {
+            ...this.$store.state.nodeData[this.selectNode.id].chartStyle,
+            nodeStyleForm: {
+              ...this.$store.state.nodeData[this.selectNode.id].chartStyle.nodeStyleForm,
+              top: this.$refs[this.selectNode.id][0].style.top.slice(0,this.$refs[this.selectNode.id][0].style.top.length-2),
+              left: this.$refs[this.selectNode.id][0].style.left.slice(0,this.$refs[this.selectNode.id][0].style.left.length-2),
+              width: resizeNode.style.width.slice(0,resizeNode.style.width.length-2),
+              height: resizeNode.style.height.slice(0,resizeNode.style.height.length-2),
+            },
+          }
         }
       });
       window.onmousemove = null;
@@ -300,85 +357,49 @@ export default {
           this.chartObj[this.nodeData[key].chartId] = this.$echarts.init(document.getElementById(this.nodeData[key].chartId));
           this.chartObj[this.nodeData[key].chartId].setOption(this.getOption(chartType,this.nodeData[key]));
         }
-
       }
 
     },
 
     // 更新单个图表
     updateOneChart(){
+      console.log('更新单个图表')
       let chartType = "";
       if(JSON.stringify(this.$store.state.currentNode) != "{}"){
+        console.log(this.$store.state.currentNode);
+        console.log(this.$store.state.nodeData[this.$store.state.currentNode.id]);
         chartType = this.$store.state.nodeData[this.$store.state.currentNode.id].chartConfig.type;
       }
       if(chartType){
+        console.log('初始化了')
         // 使用刚指定的配置项和数据显示图表
         this.chartObj[this.$store.state.currentNode.chartId] = this.$echarts.init(document.getElementById(this.nodeData[this.$store.state.currentNode.id].chartId));
-        this.chartObj[this.$store.state.currentNode.chartId].setOption(this.getOption(chartType,this.nodeData[this.$store.state.currentNode.id]));
+        let options = this.getOption(chartType,this.nodeData[this.$store.state.currentNode.id]);
+        this.chartObj[this.$store.state.currentNode.chartId].setOption(options,true);
+        console.log(options);
       }
     },
 
     getOption(chartType,nodeData){
       let option;
       if(chartType == 'bar'){
-        option = dataProcess.processBar(nodeData,this.fakeTableData);
+        try {
+          option = dataProcess.processBar(nodeData,this.fakeTableData);
+        }
+        catch (e) {
+
+        }
+
       }else if(chartType == 'line'){
         option = dataProcess.processLine(nodeData,this.fakeTableData);
       }else if(chartType == 'pie'){
-        option = option = {
-          title : {
-            text: '性别统计',
-            subtext: '纯属虚构',
-            x:'right'
-          },
-          tooltip : {
-            trigger: 'item',
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
-          },
-          legend: {
-            orient: 'vertical',
-            left: 'left',
-            data: ['本科男','本科女','硕士男','硕士女']
-          },
-          series : [
-            {
-              name: '硕士',
-              type: 'pie',
-              radius : '55%',
-              center: ['35%', '30%'],
-              data:[
-                {value:250, name:'硕士男'},
-                {value:150, name:'硕士女'}
-              ],
-              itemStyle: {
-                emphasis: {
-                  shadowBlur: 10,
-                  shadowOffsetX: 0,
-                  shadowColor: 'rgba(0, 0, 0, 0.5)'
-                }
-              }
-            },
-            {
-              name: '本科',
-              type: 'pie',
-              radius: '55%',
-              center: ['70%', '70%'],
-              data: [
-                {value: 500, name:'本科男'},
-                {value: 300, name: '本科女'}
-              ]
-            }
-          ]
-        };;
+        option = dataProcess.processPie(nodeData,this.fakeTableData);
       }
 
       return option
     },
 
-    // 处理数据
-    clsj(){
 
-    }
 
 
   },
@@ -396,11 +417,13 @@ export default {
   overflow: auto;
   padding: 20px;
   .huaban{
-    width: 960px;
-    height: 720px;
+    width: 1920px;
+    height: 1080px;
     transform-origin: 0 0;
     position: absolute;
-    background: rgb(234, 239, 244) none repeat scroll 0% 0%;
+    /*background: rgb(0, 0, 0) none repeat scroll 0% 0%;*/
+    background: url("../../../../static/images/screen-view-background1.png") no-repeat center center;
+    background-size: 100% 100%;
     .huaban-node{
       position: absolute;
       .node-resize{
@@ -512,10 +535,8 @@ export default {
       }
       .node-graphic{
         width: 100%;
-        height: 100%;
         z-index: 1;
         position: absolute;
-        top: 0;
         left: 0;
         bottom: 0;
         right: 0;

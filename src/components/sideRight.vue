@@ -16,7 +16,7 @@
           <span>维度</span>
           <Icon type="md-add" />
         </div>
-        <draggable v-model="arr1" :options="{group:{name: 'dimensionality',pull:'clone'},sort: true}" @start="dimensionalityStartDrag" @end="dimensionalityEndDrag">
+        <draggable v-model="arr1" :move="filterMoveX" :options="{group:{name: 'dimensionality',pull:'clone'},sort: true}" @start="dimensionalityStartDrag" @end="dimensionalityEndDrag">
           <transition-group>
             <!--<Tree :data="data1" expand-node></Tree>-->
             <div v-for="(item,index) in arr1" :key="index" class="side-right-draggable">
@@ -31,7 +31,7 @@
           <span>度量</span>
           <Icon type="md-add" />
         </div>
-        <draggable v-model="arr2" :options="{group:{name: 'measurement',pull:'clone'},sort: true}" @start="measurementStartDrag" @end="measurementEndDrag">
+        <draggable v-model="arr2" :move="filterMoveY" :options="{group:{name: 'measurement',pull:'clone'},sort: true}" @start="measurementStartDrag" @end="measurementEndDrag">
           <transition-group>
             <!--<Tree :data="data1" expand-node></Tree>-->
             <div v-for="(item,index) in arr2" :key="index" class="side-right-draggable">
@@ -112,6 +112,55 @@ export default {
         type: 'measurement',
         status: false
       })
+    },
+
+    // 禁止拖拽
+    filterMoveX(e){
+      let data = this.$store.state.currentNode;
+      if(JSON.stringify(data) == '{}') return false;
+      switch (data.chartConfig.type) {
+        // 柱状图
+        case 'bar':
+          console.log(data.dimensionality.length);
+          if(data.dimensionality.length == 0){
+            return true;
+          }else{
+            return false;
+          }
+          break;
+        // 折线图
+        case 'line':
+          if(data.dimensionality.length == 0){
+            return true;
+          }else{
+            return false;
+          }
+          break;
+      }
+    },
+
+    // 禁止拖拽
+    filterMoveY(e){
+      let data = this.$store.state.currentNode;
+      if(JSON.stringify(data) == '{}') return false;
+      switch (data.chartConfig.type) {
+        // 柱状图
+        case 'bar':
+          if(data.measurement.length == 0){
+            return true;
+          }else{
+            return true;
+          }
+          break;
+        // 折线图
+        case 'line':
+          if(data.measurement.length == 0){
+            return true;
+          }else{
+            return true;
+          }
+          break;
+      }
     },
   },
 

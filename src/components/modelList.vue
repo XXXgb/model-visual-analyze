@@ -1,5 +1,5 @@
 <template>
-  <Row class="wrapper-height model-list-wrapper" :style="fromC == 1 ? {background: '#fff'} : fromC == 2 ? {background: '#f9fafc'} : ''">
+  <Row class="wrapper-height model-list-wrapper" :style="fromC == 1 ? {background: '#fff'} : fromC == 2 || fromC == 3 ? {background: '#f9fafc'} : ''">
     <Col span="24" class="model-list-title">
       <h2>{{formData.name}}</h2>
       <div class="model-title-icon-wrapper">
@@ -9,6 +9,7 @@
           </a>
           <DropdownMenu slot="list">
             <DropdownItem @click.native="addReport()" v-if="fromC == 2">新建报告</DropdownItem>
+            <DropdownItem @click.native="addScreen()" v-if="fromC == 3">新建大屏</DropdownItem>
             <DropdownItem>新建文件夹</DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -103,6 +104,9 @@ export default {
       case 2:
         this.formData.name = '报告';
         break;
+      case 3:
+        this.formData.name = '大屏';
+        break;
     }
   },
   methods: {
@@ -114,6 +118,10 @@ export default {
 
     addReport(){
       this.$emit('addReportStatus',true);
+    },
+
+    addScreen(){
+      this.$emit('addScreenStatus',true);
     }
   }
 }

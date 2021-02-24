@@ -29,7 +29,7 @@ export default {
       showModelDetail: true,
       showAddModel: false,
       selectDataConnectArr: [],
-      fromC: 1,  // 来自哪个父组件的引用 1.dataModel 2.dataReport
+      fromC: 1,  // 来自哪个父组件的引用 1.dataModel 2.dataReport 3.screenView
     }
   },
   methods: {
