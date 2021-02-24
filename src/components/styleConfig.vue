@@ -455,10 +455,8 @@ export default {
   watch: {
     '$store.state.currentNode':function (val) {
       if (val) {
-        console.log(1)
         this.form = this.$store.state.nodeData[val.id].chartStyle;
       } else {
-        console.log(2)
         this.form = {
           xForm: {
             showXAxis: false,
@@ -523,7 +521,7 @@ export default {
     },
   },
   mounted(){
-    console.log(this.form);
+
   },
   methods: {
 
